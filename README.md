@@ -33,12 +33,12 @@ sankeymien -a abundance_table.tsv -j experiments.json -o testoutput -t taxon
 
 The abundance sample should look like this:
 
-| organism | s1   | s2   | k1 | taxon            |
-|----------|------|------|----|------------------|
-| org_a    | 1    | 2    | 5  | Bos              |
-| org_b    | 2000 | 3000 | 10 | Escherichia      |
-| org_c    | 500  | 600  | 5  | Parcubacteria    |
-| org_d    | 20   | 30   | 0  | Methanobacterium |
+| organism | s1   | s2   | k1 | Ec1_1 | Ec1_2 | Ec1_3 | kec1 | taxon            |
+|----------|------|------|----|-------|-------|-------|------|------------------|
+| org_a    | 1    | 2    | 5  | 0     | 0     | 0     | 0    | Bos              |
+| org_b    | 2000 | 3000 | 10 | 100   | 120   | 130   | 1    | Escherichia      |
+| org_c    | 500  | 600  | 5  | 100   | 200   | 300   | 0    | Parcubacteria    |
+| org_d    | 20   | 30   | 0  | 25    | 35    | 40    | 0    | Methanobacterium |
 
 The json should correspond to this:
 
