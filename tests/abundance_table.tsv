@@ -1,0 +1,18 @@
+organism	s1	s2	k1	Ec1_1	Ec1_2	Ec1_3	kec1	Ec2_1	Ec2_2	Ec2_3	Kec2_1	Kec2_2	ec3	Ec4_1	Ec4_2	ec5	taxon
+org_a	1	2	5	0	0	0	0	0	0	0	0	0	0	0	0	0	Bos
+org_b	2000	3000	10	100	120	130	1	110	200	150	5	10	120	0	0	0	Escherichia
+org_c	500	600	5	100	200	300	0	200	300	400	5	5	200	200	150	150	Parcubacteria
+org_d	20	30	0	25	35	40	0	40	50	60	0	0	70	100	100	150	Methanobacterium
+org_e	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	Yersinia
+org_f	1000	1500	0	100	200	300	0	150	140	150	0	0	140	150	160	200	Halobacteria
+org_g	50	50	50	50	50	50	50	50	50	50	50	50	50	50	50	50	Serratia
+org_h	500	250	0	200	300	100	0	150	200	600	0	0	600	500	400	620	Geobacter
+org_i	10	12	12	10	12	120	10	12	10	12	10	12	10	12	12	10	Deinococcus
+org_j	400	200	10	1	5	2	4	51	5	4	1	2	4	5	1	56	Peptococcus
+org_k	100	100	20	20	2	1	6	5	6	5		1	5	2	2		Escherichia
+org_l																	Escherichia
+org_m	1	5	4	2	6	4	6	2	6	4	2	6	4	5	4	2	Deinococcus
+org_n	1	5	4	2	6	4	6	2	6	4	0	0	0	0	0	0	Deinococcus
+org_o	1	5	4	2	6	4	6	2	6	4	4	5	5	0	0	0	Brucella
+org_p	1	5	4	2	6	4	6	2	6	4	4	5	5	6	6	0	Moorella
+org_q	0	0	0	0	0	0	0	20	20	30	0	0	34	54	54	65	Chlamydia

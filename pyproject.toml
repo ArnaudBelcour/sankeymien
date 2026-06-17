@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sankeymien"
+dynamic = ["version"]
+readme = "README.md"
+description = "Sankey diagram for Microbial Enrichment cultures. ."
+license = {text = "GPL-3.0-or-later"}
+
+dependencies = [
+  'plotly',
+  'pandas'
+]
+
+[project.scripts]
+sankeymien = "sankeymien.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/ArnaudBelcour/sankeymien"
+Changelog = "https://github.com/ArnaudBelcour/sankeymien/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+test = ['pytest']
+
+[tool.setuptools]
+packages = ['sankeymien']
+package-dir = {'sankeymien'= 'sankeymien'}
+
+[tool.setuptools.dynamic]
+version = { attr = "sankeymien.__version__" }
+dependencies = {file = ["requirements.txt"]}
