@@ -10,7 +10,7 @@ This package requires:
 - plotly and kaleido (with google chrome installed).
 - pandas and numpy.
 
-It can be isntalled with pip:
+It can be installed with pip:
 ```
 pip install sankeymien
 ```
