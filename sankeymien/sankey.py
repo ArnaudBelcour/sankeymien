@@ -76,31 +76,31 @@ def generate_sankey_diagram(input_file, type_cols, taxon_col, output_file):
     for type_col in type_cols:
         df[type_col] = df[type_cols[type_col]].mean(axis=1)
 
-    abund_org_unique_kc_T1 = diff_between_group(df, ['kit_control', 'enrichment_T01'], ['reservoir'], 'enrichment_T01', threshold)
+    abund_org_unique_kc_T1 = diff_between_group(df, ['kit_control', 'enrichment_T01'], ['initial'], 'enrichment_T01', threshold)
 
-    abund_org_unique_reservoir_T1 = diff_between_group(df, ['reservoir', 'enrichment_T01'], ['kit_control'], 'enrichment_T01', threshold)
+    abund_org_unique_reservoir_T1 = diff_between_group(df, ['initial', 'enrichment_T01'], ['kit_control'], 'enrichment_T01', threshold)
 
-    abund_org_shared_kc_reservoir_T1 = diff_between_group(df, ['reservoir', 'kit_control', 'enrichment_T01'], [], 'enrichment_T01', threshold)
+    abund_org_shared_kc_reservoir_T1 = diff_between_group(df, ['initial', 'kit_control', 'enrichment_T01'], [], 'enrichment_T01', threshold)
 
-    negative_controls = ['kit_control', 'reservoir']
+    negative_controls = ['kit_control', 'initial']
     if 'kit_control_T01' in type_cols:
         negative_controls.append('kit_control_T01')
     abund_org_appearing_T1 = diff_between_group(df, ['enrichment_T01'], negative_controls, 'enrichment_T01', threshold)
 
     if 'kit_control_T01' in type_cols:
-        abund_org_kc_T1 = diff_between_group(df, ['kit_control_T01', 'enrichment_T01'], ['kit_control', 'reservoir'], 'enrichment_T01', threshold)
+        abund_org_kc_T1 = diff_between_group(df, ['kit_control_T01', 'enrichment_T01'], ['kit_control', 'initial'], 'enrichment_T01', threshold)
     else:
         abund_org_kc_T1 = None
 
     abund_org_dead_kc = diff_between_group(df, ['kit_control'], ['enrichment_T01'], 'kit_control', threshold)
 
-    abund_org_dead_reservoir = diff_between_group(df, ['reservoir'], ['enrichment_T01'], 'reservoir', threshold)
+    abund_org_dead_reservoir = diff_between_group(df, ['initial'], ['enrichment_T01'], 'initial', threshold)
 
-    sankey_nodes = ['kit_control', 'reservoir', 'kc_reservoir', 'kit_control_T01', 'enrichment_T01', 'enrichment_T02']
-    sankey_links = {('kit_control', 'enrichment_T01'): abund_org_unique_kc_T1, ('kc_reservoir', 'enrichment_T01'): abund_org_shared_kc_reservoir_T1,
-                    ('reservoir', 'enrichment_T01'): abund_org_unique_reservoir_T1,
+    sankey_nodes = ['kit_control', 'initial', 'kc_initial', 'kit_control_T01', 'enrichment_T01', 'enrichment_T02']
+    sankey_links = {('kit_control', 'enrichment_T01'): abund_org_unique_kc_T1, ('kc_initial', 'enrichment_T01'): abund_org_shared_kc_reservoir_T1,
+                    ('initial', 'enrichment_T01'): abund_org_unique_reservoir_T1,
                     ('appearing', 'enrichment_T01'): abund_org_appearing_T1, ('kit_control_T01', 'enrichment_T01'): abund_org_kc_T1,
-                   ('kit_control', 'inoc_dead'): abund_org_dead_kc, ('reservoir', 'inoc_dead'): abund_org_dead_reservoir}
+                   ('kit_control', 'inoc_dead'): abund_org_dead_kc, ('initial', 'inoc_dead'): abund_org_dead_reservoir}
 
     enrichment_times = sorted([type_col for type_col in type_cols if 'enrichment_' in type_col and type_col != 'enrichment_T01'])
 
@@ -112,13 +112,13 @@ def generate_sankey_diagram(input_file, type_cols, taxon_col, output_file):
         appearing = 'appearing_' + current_time
         if enrichment_time in type_cols:
             if kit_control in type_cols:
-                abund_org_kc_T1 = diff_between_group(df, [kit_control, current_time], ['kit_control', 'reservoir'], current_time, threshold)
+                abund_org_kc_T1 = diff_between_group(df, [kit_control, current_time], ['kit_control', 'initial'], current_time, threshold)
             else:
                 abund_org_kc_T1 = None
             abund_org_T1_T2 = diff_between_group(df, [previous_time, current_time], [], previous_time, threshold)
             abund_org_appearing_T2 = diff_between_group(df, [current_time], [previous_time], current_time, threshold)
             abund_org_dead_T1 = diff_between_group(df, [previous_time], [current_time], previous_time, threshold)
-            negative_controls = ['kit_control', 'reservoir', previous_time]
+            negative_controls = ['kit_control', 'initial', previous_time]
             abund_org_appearing_T1 = diff_between_group(df, [current_time], negative_controls, current_time, threshold)
             sankey_links[(previous_time, current_time)] = abund_org_T1_T2
             sankey_links[(kit_control, current_time)] = abund_org_kc_T1
@@ -157,7 +157,6 @@ def generate_sankey_diagram(input_file, type_cols, taxon_col, output_file):
                         node_values[node_link[1]] = sankey_links[node_link]
                     else:
                         node_values[node_link[1]] += sankey_links[node_link]
-    print(node_values)
 
     if len(enrichment_times) > 0:
         final_time = enrichment_times[-1]
@@ -206,7 +205,7 @@ def generate_sankey_diagram(input_file, type_cols, taxon_col, output_file):
         value = modified_values
     ))])
 
-    fig.update_layout(title_text="", font_size=12, width=1600, height=1000)
+    fig.update_layout(title_text="", font_size=16, width=1600, height=1000)
     fig.write_image(output_file)
 
 

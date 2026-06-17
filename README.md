@@ -29,6 +29,30 @@ sankeymien -a abundance_table.tsv -j experiments.json -o testoutput -t taxon
 
 `-o testoutput` is the output folder.
 
-## Usage
+## Input
+
+The abundance sample should look like this:
+
+| organism | s1   | s2   | k1 | taxon            |
+|----------|------|------|----|------------------|
+| org_a    | 1    | 2    | 5  | Bos              |
+| org_b    | 2000 | 3000 | 10 | Escherichia      |
+| org_c    | 500  | 600  | 5  | Parcubacteria    |
+| org_d    | 20   | 30   | 0  | Methanobacterium |
+
+The json should correspond to this:
+
+```json
+{
+    "experiment_2": {
+        "initial": ["s1", "s2"],
+        "kit_control": ["k1"],
+        "enrichment_T01": ["Ec1_1", "Ec1_2", "Ec1_3"],
+        "kit_control_T01": ["kec1"]
+    }
+}
+```
+
+## Output
 
 It generates a Sankey diagram showing the flow of relative abundance of organisms according to the different time steps of the enrichment cultures. The final enrichment is linked to taxon name to show the composition of the final communities.

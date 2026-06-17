@@ -1,6 +1,6 @@
 {
     "experiment_1": {
-        "reservoir": ["s1", "s2"],
+        "initial": ["s1", "s2"],
         "kit_control": ["k1"],
         "enrichment_T01": ["Ec1_1", "Ec1_2", "Ec1_3"],
         "kit_control_T01": ["kec1"],
@@ -11,7 +11,7 @@
         "enrichment_T05": ["ec5"]
     },
     "experiment_2": {
-        "reservoir": ["s1", "s2"],
+        "initial": ["s1", "s2"],
         "kit_control": ["k1"],
         "enrichment_T01": ["Ec1_1", "Ec1_2", "Ec1_3"],
         "kit_control_T01": ["kec1"]

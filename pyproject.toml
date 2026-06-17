@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "sankeymien"
 dynamic = ["version"]
 readme = "README.md"
-description = "Sankey diagram for Microbial Enrichment cultures. ."
+description = "Sankey diagram for Microbial Enrichment cultures."
 license = {text = "GPL-3.0-or-later"}
 
 dependencies = [
