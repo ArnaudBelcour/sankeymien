@@ -80,6 +80,23 @@ def main():
         help='Output directory path.',
         metavar='OUPUT_DIR')
 
+    parser.add_argument(
+        "-t",
+        dest='abundance_threshold',
+        help="Abundance threshold to show taxon name above this threshold.",
+        required=False,
+        type=int,
+        default=0)
+
+    parent_parser_relative = argparse.ArgumentParser(add_help=False)
+    parent_parser_relative.add_argument(
+        '--relative',
+        dest='relative',
+        help='Compute relative abundance from abundance file.',
+        required=False,
+        action='store_true',
+        default=None)
+
     args = parser.parse_args()
 
     # If no argument print the help.
@@ -105,7 +122,7 @@ def main():
     logger.addHandler(console_handler)
 
     logger.info("--- Generate Sankey diagram for microbial enrichment cultures ---")
-    handle_input(args.abundance_file, args.json_file, args.taxon, args.output)
+    handle_input(args.abundance_file, args.json_file, args.taxon, args.output, args.abundance_threshold, args.relative)
 
     duration = time.time() - start_time
     logger.info("--- Total runtime %.2f seconds ---" % (duration))
