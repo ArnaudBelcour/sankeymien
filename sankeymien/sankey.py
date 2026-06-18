@@ -24,7 +24,7 @@ import plotly.graph_objects as go
 
 logger = logging.getLogger(__name__)
 
-def diff_between_group(abundance_dataframe, positive_control_groups, negative_control_groups, group_abundance, threshold):
+def diff_between_group(abundance_dataframe, positive_control_groups, negative_control_groups, group_abundance, threshold, output_file):
     """ Subselect organisms according to their presence/absence in subset of samples and then returns the sum of their abundance from a type of sample.
 
     Args:
@@ -33,6 +33,7 @@ def diff_between_group(abundance_dataframe, positive_control_groups, negative_co
         negative_control_groups (list):  list of groups that should contain organisms with zero abundance
         group_abundance (str): column to use to get the total abundace of organisms
         threshold (float): abundance threshold for positive control
+        output_file (str): path to output file
 
     Returns:
         abundance_org (float): summed abundance of kept organisms
@@ -42,6 +43,7 @@ def diff_between_group(abundance_dataframe, positive_control_groups, negative_co
         tmp_df = tmp_df[tmp_df[group]>threshold]
     for group in negative_control_groups:
         tmp_df = tmp_df[tmp_df[group]==0]
+    tmp_df.to_csv(output_file, sep='\t')
     abundance_org = tmp_df[group_abundance].sum()
 
     return abundance_org
@@ -116,16 +118,24 @@ def generate_node_edges(all_edges, node_values):
     return sources, source_label_nodes, targets, target_label_nodes, labels, values
 
 
-def generate_sankey_diagram(input_file, type_cols, taxon_col, output_file, abundance_threshold=0, relative=None):
+def generate_sankey_diagram(input_file, type_cols, taxon_col, output_folder, abundance_threshold=0, relative=None):
     """ Generate Sankey diagram from input file and input dictionary.
 
     Args:
         input_file (str): path to input abundance file
         type_cols (dict): dictionary associating samples and time steps
         taxon_col (str): column containing taxon names
+        output_folder (str): path to output folder
         abundance_threshold (int): abundance htreshold to show taxon name
         relative (bool): if True, compute relative abundance instead of absolute
     """
+    if not os.path.exists(output_folder):
+        os.mkdir(output_folder)
+
+    intermediary_folder = os.path.join(output_folder, 'intermediary_folder')
+    if not os.path.exists(intermediary_folder):
+        os.mkdir(intermediary_folder)
+
     df = pd.read_csv(input_file, sep='\t', index_col=0)
     df[taxon_col] = df[taxon_col].replace(np.nan, 'Unknown')
     samples_cols = [sample for res_type in type_cols for sample in type_cols[res_type]]
@@ -141,25 +151,32 @@ def generate_sankey_diagram(input_file, type_cols, taxon_col, output_file, abund
     for type_col in type_cols:
         df[type_col] = df[type_cols[type_col]].mean(axis=1)
 
-    abund_org_unique_kc_T1 = diff_between_group(df, ['kit_control', 'enrichment_T01'], ['initial'], 'enrichment_T01', threshold)
+    output_file = os.path.join(intermediary_folder, 'edge_kit_control_to_enrichment_T01.tsv')
+    abund_org_unique_kc_T1 = diff_between_group(df, ['kit_control', 'enrichment_T01'], ['initial'], 'enrichment_T01', threshold, output_file)
 
-    abund_org_unique_initial_T1 = diff_between_group(df, ['initial', 'enrichment_T01'], ['kit_control'], 'enrichment_T01', threshold)
+    output_file = os.path.join(intermediary_folder, 'edge_initial_to_enrichment_T01.tsv')
+    abund_org_unique_initial_T1 = diff_between_group(df, ['initial', 'enrichment_T01'], ['kit_control'], 'enrichment_T01', threshold, output_file)
 
-    abund_org_shared_kc_initial_T1 = diff_between_group(df, ['initial', 'kit_control', 'enrichment_T01'], [], 'enrichment_T01', threshold)
+    output_file = os.path.join(intermediary_folder, 'edge_kc_initial_to_enrichment_T01.tsv')
+    abund_org_shared_kc_initial_T1 = diff_between_group(df, ['initial', 'kit_control', 'enrichment_T01'], [], 'enrichment_T01', threshold, output_file)
 
     negative_controls = ['kit_control', 'initial']
     if 'kit_control_T01' in type_cols:
         negative_controls.append('kit_control_T01')
-    abund_org_appearing_T1 = diff_between_group(df, ['enrichment_T01'], negative_controls, 'enrichment_T01', threshold)
+    output_file = os.path.join(intermediary_folder, 'edge_appearing_to_enrichment_T01.tsv')
+    abund_org_appearing_T1 = diff_between_group(df, ['enrichment_T01'], negative_controls, 'enrichment_T01', threshold, output_file)
 
     if 'kit_control_T01' in type_cols:
-        abund_org_kc_T1 = diff_between_group(df, ['kit_control_T01', 'enrichment_T01'], ['kit_control', 'initial'], 'enrichment_T01', threshold)
+        output_file = os.path.join(intermediary_folder, 'edge_kit_control_T01_to_enrichment_T01.tsv')
+        abund_org_kc_T1 = diff_between_group(df, ['kit_control_T01', 'enrichment_T01'], ['kit_control', 'initial'], 'enrichment_T01', threshold, output_file)
     else:
         abund_org_kc_T1 = None
 
-    abund_org_dead_kc = diff_between_group(df, ['kit_control'], ['enrichment_T01'], 'kit_control', threshold)
+    output_file = os.path.join(intermediary_folder, 'edge_kit_control_to_initial_dead.tsv')
+    abund_org_dead_kc = diff_between_group(df, ['kit_control'], ['enrichment_T01'], 'kit_control', threshold, output_file)
 
-    abund_org_dead_initial = diff_between_group(df, ['initial'], ['enrichment_T01'], 'initial', threshold)
+    output_file = os.path.join(intermediary_folder, 'edge_initial_to_initial_dead.tsv')
+    abund_org_dead_initial = diff_between_group(df, ['initial'], ['enrichment_T01'], 'initial', threshold, output_file)
 
     sankey_nodes = ['kit_control', 'initial', 'kc_initial', 'kit_control_T01', 'enrichment_T01', 'enrichment_T02']
     sankey_links = {('kit_control', 'enrichment_T01'): abund_org_unique_kc_T1, ('kc_initial', 'enrichment_T01'): abund_org_shared_kc_initial_T1,
@@ -177,14 +194,19 @@ def generate_sankey_diagram(input_file, type_cols, taxon_col, output_file, abund
         appearing = 'appearing_' + current_time
         if enrichment_time in type_cols:
             if kit_control in type_cols:
-                abund_org_kc_T1 = diff_between_group(df, [kit_control, current_time], ['kit_control', 'initial'], current_time, threshold)
+                output_file = os.path.join(intermediary_folder, f'edge_{kit_control}_to_{current_time}.tsv')
+                abund_org_kc_T1 = diff_between_group(df, [kit_control, current_time], ['kit_control', 'initial'], current_time, threshold, output_file)
             else:
                 abund_org_kc_T1 = None
-            abund_org_T1_T2 = diff_between_group(df, [previous_time, current_time], [], previous_time, threshold)
-            abund_org_appearing_T2 = diff_between_group(df, [current_time], [previous_time], current_time, threshold)
-            abund_org_dead_T1 = diff_between_group(df, [previous_time], [current_time], previous_time, threshold)
+            output_file = os.path.join(intermediary_folder, f'edge_{previous_time}_to_{current_time}.tsv')
+            abund_org_T1_T2 = diff_between_group(df, [previous_time, current_time], [], previous_time, threshold, output_file)
+            output_file = os.path.join(intermediary_folder, 'abund_org_appearing_'+current_time+'.tsv')
+            abund_org_appearing_T2 = diff_between_group(df, [current_time], [previous_time], current_time, threshold, output_file)
+            output_file = os.path.join(intermediary_folder, f'edge_{previous_time}_to_{culture_dead}.tsv')
+            abund_org_dead_T1 = diff_between_group(df, [previous_time], [current_time], previous_time, threshold, output_file)
             negative_controls = ['kit_control', 'initial', previous_time]
-            abund_org_appearing_T1 = diff_between_group(df, [current_time], negative_controls, current_time, threshold)
+            output_file = os.path.join(intermediary_folder, f'edge_{appearing}_to_{current_time}.tsv')
+            abund_org_appearing_T1 = diff_between_group(df, [current_time], negative_controls, current_time, threshold, output_file)
             sankey_links[(previous_time, current_time)] = abund_org_T1_T2
             sankey_links[(kit_control, current_time)] = abund_org_kc_T1
             sankey_links[(previous_time, culture_dead)] = abund_org_dead_T1
@@ -236,8 +258,15 @@ def generate_sankey_diagram(input_file, type_cols, taxon_col, output_file, abund
 
     sources, source_label_nodes, targets, target_label_nodes, labels, values = generate_node_edges(all_edges, node_values)
 
+    nodes = [node_nb for node_nb in range(len(labels))]
+    node_values = [node_values[node_label] for node_label in labels]
+    sankey_node_df = pd.DataFrame({'node': nodes, 'label': labels, 'value': node_values})
+    node_output_file = os.path.join(output_folder, 'sankey_diagram_node.tsv')
+    sankey_node_df.to_csv(node_output_file, sep='\t', index=False)
+
     sankey_df = pd.DataFrame({'source': sources, 'source_node': source_label_nodes, 'target': targets, 'target_node': target_label_nodes, 'value': values})
-    sankey_df.to_csv(output_file.replace('.png', '.tsv'), sep='\t', index=False)
+    edge_output_file = os.path.join(output_folder, 'sankey_diagram_edge.tsv')
+    sankey_df.to_csv(edge_output_file, sep='\t', index=False)
 
     fig = go.Figure(data=[go.Sankey(
         node = dict(
@@ -253,7 +282,8 @@ def generate_sankey_diagram(input_file, type_cols, taxon_col, output_file, abund
     ))])
 
     fig.update_layout(title_text="", font_size=16, width=1600, height=1000)
-    fig.write_image(output_file)
+    diagram_output_file = os.path.join(output_folder, 'sankey_diagram.png')
+    fig.write_image(diagram_output_file)
 
 
 def handle_input(abundance_file, json_file, taxon_name, output_folder, abundance_threshold=0, relative=None):
@@ -276,5 +306,5 @@ def handle_input(abundance_file, json_file, taxon_name, output_folder, abundance
     for experiment in json_data:
         logger.info(f'Generate Sankey diagram for experiments {experiment}')
         type_cols = json_data[experiment]
-        output_file = os.path.join(output_folder, experiment+'.png')
-        generate_sankey_diagram(abundance_file, type_cols, taxon_name, output_file, abundance_threshold, relative)
+        experiment_output_folder = os.path.join(output_folder, experiment)
+        generate_sankey_diagram(abundance_file, type_cols, taxon_name, experiment_output_folder, abundance_threshold, relative)

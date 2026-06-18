@@ -1,5 +1,15 @@
 # Changelog
 
+# sankeymien v0.0.3 (2026-06-18)
+
+## Add
+
+- several output fiels to show corresponding organisms for each edge.
+
+## Modify
+
+- Make output folder for each experiments.
+
 # sankeymien v0.0.2 (2026-06-17)
 
 ## Add

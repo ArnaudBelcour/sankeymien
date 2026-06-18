@@ -81,15 +81,14 @@ def main():
         metavar='OUPUT_DIR')
 
     parser.add_argument(
-        "-t",
+        "--abundance-threshold",
         dest='abundance_threshold',
         help="Abundance threshold to show taxon name above this threshold.",
         required=False,
         type=int,
         default=0)
 
-    parent_parser_relative = argparse.ArgumentParser(add_help=False)
-    parent_parser_relative.add_argument(
+    parser.add_argument(
         '--relative',
         dest='relative',
         help='Compute relative abundance from abundance file.',

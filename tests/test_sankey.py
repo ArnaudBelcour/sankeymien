@@ -1,6 +1,6 @@
 from sankeymien.sankey import handle_input, generate_sankey_diagram, generate_node_edges
 import shutil
-
+import os
 
 def test_handle_input():
     abundance_file = 'abundance_table.tsv'
@@ -8,6 +8,12 @@ def test_handle_input():
     taxon_col = 'taxon'
     output_folder = 'output_folder'
     handle_input(abundance_file, json_file, taxon_col, output_folder)
+
+    sankey_diagram = os.path.join(output_folder, 'experiment_1', 'sankey_diagram.png')
+    assert os.path.exists(sankey_diagram)
+    sankey_diagram = os.path.join(output_folder, 'experiment_2', 'sankey_diagram.png')
+    assert os.path.exists(sankey_diagram)
+
     shutil.rmtree(output_folder)
 
 
