@@ -54,7 +54,7 @@ The json should correspond to this:
 
 ```json
 {
-    "experiment_2": {
+    "experiment_1": {
         "initial": ["s1", "s2"],
         "kit_control": ["k1"],
         "enrichment_T01": ["Ec1_1", "Ec1_2", "Ec1_3"],
@@ -65,4 +65,20 @@ The json should correspond to this:
 
 ## Output
 
-It generates a Sankey diagram showing the flow of relative abundance of organisms according to the different time steps of the enrichment cultures. The final enrichment is linked to taxon name to show the composition of the final communities.
+It generates one output folder for each experiment in the json file. The output folder contains:
+
+```
+output_folder
+├── experiment_1
+│   ├── intermediary_folder
+│   |   └── ...
+│   |   └── edge_initial_to_enrichment_T01.tsv
+│   |   └── sample_1_nitrogen_cycle.png
+│   |   └── ...
+│   ├── sankey_diagram_edge.tsv
+│   ├── sankey_diagram_node.tsv
+│   ├── sankey_diagram.png
+├── sankeymien.log
+```
+
+ a Sankey diagram showing the flow of relative abundance of organisms according to the different time steps of the enrichment cultures. The final enrichment is linked to taxon name to show the composition of the final communities.
