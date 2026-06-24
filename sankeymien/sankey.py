@@ -157,38 +157,50 @@ def generate_sankey_diagram(input_file, type_cols, taxon_col, output_folder, abu
     for type_col in type_cols:
         df[type_col] = df[type_cols[type_col]].mean(axis=1)
 
-    output_file = os.path.join(intermediary_folder, 'edge_kit_control_to_enrichment_T01.tsv')
-    abund_org_unique_kc_T1 = diff_between_group(df, ['kit_control', 'enrichment_T01'], ['initial'], 'enrichment_T01', threshold, output_file)
-
+    negative_controls = []
+    if 'kit_control' in type_cols:
+        negative_controls.append('kit_control')
     output_file = os.path.join(intermediary_folder, 'edge_initial_to_enrichment_T01.tsv')
-    abund_org_unique_initial_T1 = diff_between_group(df, ['initial', 'enrichment_T01'], ['kit_control'], 'enrichment_T01', threshold, output_file)
+    abund_org_unique_initial_T1 = diff_between_group(df, ['initial', 'enrichment_T01'], negative_controls, 'enrichment_T01', threshold, output_file)
 
-    output_file = os.path.join(intermediary_folder, 'edge_kc_initial_to_enrichment_T01.tsv')
-    abund_org_shared_kc_initial_T1 = diff_between_group(df, ['initial', 'kit_control', 'enrichment_T01'], [], 'enrichment_T01', threshold, output_file)
+    if 'kit_control' in type_cols:
+        output_file = os.path.join(intermediary_folder, 'edge_kc_initial_to_enrichment_T01.tsv')
+        abund_org_shared_kc_initial_T1 = diff_between_group(df, ['initial', 'kit_control', 'enrichment_T01'], [], 'enrichment_T01', threshold, output_file)
 
-    negative_controls = ['kit_control', 'initial']
+        output_file = os.path.join(intermediary_folder, 'edge_kit_control_to_enrichment_T01.tsv')
+        abund_org_unique_kc_T1 = diff_between_group(df, ['kit_control', 'enrichment_T01'], ['initial'], 'enrichment_T01', threshold, output_file)
+
+        output_file = os.path.join(intermediary_folder, 'edge_kit_control_to_initial_dead.tsv')
+        abund_org_dead_kc = diff_between_group(df, ['kit_control'], ['enrichment_T01'], 'kit_control', threshold, output_file)
+    else:
+        abund_org_shared_kc_initial_T1 = None
+        abund_org_unique_kc_T1 = None
+        abund_org_dead_kc = None
+
+    negative_controls = ['initial']
+    if 'kit_control' in type_cols:
+        negative_controls.append('kit_control')
     if 'kit_control_T01' in type_cols:
         negative_controls.append('kit_control_T01')
     output_file = os.path.join(intermediary_folder, 'edge_appearing_to_enrichment_T01.tsv')
     abund_org_appearing_T1 = diff_between_group(df, ['enrichment_T01'], negative_controls, 'enrichment_T01', threshold, output_file)
 
     if 'kit_control_T01' in type_cols:
+        negative_controls = ['initial']
+        if 'kit_control' in type_cols:
+            negative_controls.append('kit_control')
         output_file = os.path.join(intermediary_folder, 'edge_kit_control_T01_to_enrichment_T01.tsv')
-        abund_org_kc_T1 = diff_between_group(df, ['kit_control_T01', 'enrichment_T01'], ['kit_control', 'initial'], 'enrichment_T01', threshold, output_file)
+        abund_org_kc_T1 = diff_between_group(df, ['kit_control_T01', 'enrichment_T01'], negative_controls, 'enrichment_T01', threshold, output_file)
     else:
         abund_org_kc_T1 = None
-
-    output_file = os.path.join(intermediary_folder, 'edge_kit_control_to_initial_dead.tsv')
-    abund_org_dead_kc = diff_between_group(df, ['kit_control'], ['enrichment_T01'], 'kit_control', threshold, output_file)
 
     output_file = os.path.join(intermediary_folder, 'edge_initial_to_initial_dead.tsv')
     abund_org_dead_initial = diff_between_group(df, ['initial'], ['enrichment_T01'], 'initial', threshold, output_file)
 
-    sankey_nodes = ['kit_control', 'initial', 'kc_initial', 'kit_control_T01', 'enrichment_T01', 'enrichment_T02']
     sankey_links = {('kit_control', 'enrichment_T01'): abund_org_unique_kc_T1, ('kc_initial', 'enrichment_T01'): abund_org_shared_kc_initial_T1,
-                    ('initial', 'enrichment_T01'): abund_org_unique_initial_T1,
-                    ('appearing', 'enrichment_T01'): abund_org_appearing_T1, ('kit_control_T01', 'enrichment_T01'): abund_org_kc_T1,
-                   ('kit_control', 'initial_dead'): abund_org_dead_kc, ('initial', 'initial_dead'): abund_org_dead_initial}
+                    ('initial', 'enrichment_T01'): abund_org_unique_initial_T1, ('appearing', 'enrichment_T01'): abund_org_appearing_T1,
+                    ('kit_control_T01', 'enrichment_T01'): abund_org_kc_T1, ('kit_control', 'initial_dead'): abund_org_dead_kc,
+                    ('initial', 'initial_dead'): abund_org_dead_initial}
 
     enrichment_times = sorted([type_col for type_col in type_cols if 'enrichment_' in type_col and type_col != 'enrichment_T01'])
 
