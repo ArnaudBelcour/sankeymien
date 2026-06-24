@@ -1,10 +1,11 @@
 # Changelog
 
-# sankeymien v0.0.3 (2026-06-18)
+# sankeymien v0.0.3 (2026-06-24)
 
 ## Add
 
-- several output fiels to show corresponding organisms for each edge.
+- several output files to show corresponding organisms for each edge.
+- json file for metadata.
 
 ## Modify
 

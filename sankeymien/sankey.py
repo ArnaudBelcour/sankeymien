@@ -14,6 +14,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
 import os
+import sys
+import time
 import pandas as pd
 import numpy as np
 
@@ -21,6 +23,10 @@ import json
 import logging
 
 import plotly.graph_objects as go
+
+from plotly import __version__ as plotly_version
+from sankeymien import __version__ as sankeymien_version
+from importlib.metadata import version
 
 logger = logging.getLogger(__name__)
 
@@ -296,6 +302,7 @@ def handle_input(abundance_file, json_file, taxon_name, output_folder, abundance
         abundance_threshold (int): abundance htreshold to show taxon name
         relative (bool): if True, compute relative abundance instead of absolute
     """
+    start_time = time.time()
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
 
@@ -308,3 +315,24 @@ def handle_input(abundance_file, json_file, taxon_name, output_folder, abundance
         type_cols = json_data[experiment]
         experiment_output_folder = os.path.join(output_folder, experiment)
         generate_sankey_diagram(abundance_file, type_cols, taxon_name, experiment_output_folder, abundance_threshold, relative)
+
+
+    duration = time.time() - start_time
+    metadata_json = {}
+    metadata_json['tool_dependencies'] = {}
+    metadata_json['tool_dependencies']['python_package'] = {}
+    metadata_json['tool_dependencies']['python_package']['Python_version'] = sys.version
+    metadata_json['tool_dependencies']['python_package']['sankeymien'] = sankeymien_version
+    metadata_json['tool_dependencies']['python_package']['pandas'] = pd.__version__
+    metadata_json['tool_dependencies']['python_package']['numpy'] = np.__version__
+    metadata_json['tool_dependencies']['python_package']['plotly'] = plotly_version
+    metadata_json['tool_dependencies']['python_package']['kaleido'] = version('kaleido')
+
+    metadata_json['input_parameters'] = {'abundance_file': abundance_file, 'json_file': json_file, 'output_folder': output_folder,
+                                         'abundance_threshold': abundance_threshold, 'relative': relative}
+    metadata_json['duration'] = duration
+
+    metadata_file = os.path.join(output_folder, 'sankeymien_metadata.json')
+    with open(metadata_file, 'w') as ouput_file:
+        json.dump(metadata_json, ouput_file, indent=4)
+
