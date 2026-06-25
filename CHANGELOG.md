@@ -1,6 +1,6 @@
 # Changelog
 
-# sankeymien v0.0.3 (2026-06-24)
+# sankeymien v0.0.3 (2026-06-25)
 
 ## Add
 
@@ -11,6 +11,7 @@
 
 - Make output folder for each experiments.
 - Handle experiments without initial kit control.
+- Update readme.
 
 # sankeymien v0.0.2 (2026-06-17)
 
